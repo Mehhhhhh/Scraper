@@ -1,0 +1,95 @@
+# Scraper program
+
+Simple scraper program that scrapes data from https://www.nasdaq.com/market-activity/stocks/fb and produce relevant information then output.
+ 
+## Code Hierarchy
+```{bash}
+.  
+|-- setenv  
+|-- README.md  
+|-- controllers  
+|&nbsp;&nbsp;&nbsp;|-- simple_data_source.py  
+|&nbsp;&nbsp;&nbsp;\`-- simple_data_source_test.py  
+|-- logging.conf  
+|-- main.py  
+|-- output_handlers  
+|&nbsp;&nbsp;&nbsp;|-- base_handler.py  
+|&nbsp;&nbsp;&nbsp;|-- file_handler.py  
+|&nbsp;&nbsp;&nbsp;|-- output_handler_factory.py  
+|&nbsp;&nbsp;&nbsp;\`-- stdout_handler.py  
+|-- requesters  
+|&nbsp;&nbsp;&nbsp;|-- base_requester.py  
+|&nbsp;&nbsp;&nbsp;|-- nasdaq_requester.py  
+|&nbsp;&nbsp;&nbsp;|-- nasdaq_requester_test.py  
+|&nbsp;&nbsp;&nbsp;\`-- requester_factory.py  
+\`-- requirements.txt  
+```
+
+## Environment set-up
+```{bash}
+source setenv
+```
+
+## Execution examples
+
+Use console
+```{bash}
+python scraper.py --scraping-interval-seconds 1 --output-mode console
+```
+
+Use file
+```{bash}
+python scraper.py --scraping-interval-seconds 1 --output-mode file --file-path ./out.a
+```
+
+## Genenral idea
+
+The program could have been written in a monolithic way with a single function that does the minimum.
+However it's worthwhile to make it more scalable for potential extension.
+
+### Requesters
+
+Requester is the layer for getting data from specified resources. There are:
+- `BaseRequester` - Base class that defines the interfaces (in this case - getting the last sale price);
+- `NasdaqRequester` - Concrete class that implements the underlying details;
+> **Implementation for nasdaq webpage**
+>
+>The last sale's price is dynamically updated, therefore it's not possible to simply get the static html and fetch the data.
+>I have checked the network history from browser and noticed that, calls to this API https://api.nasdaq.com/api/quote/FB/info?assetclass=stocks
+>return useful information and we can find last sales price there.
+
+- `RequesterFactory` - Factory to get desired concrete requester class.
+
+
+*Future considerations*
+- new pages to parse -> new concrete requester class
+- new data to get -> new interface in the base class and for each requesters to implement the details
+
+
+### Controllers
+
+Controller is in charge of managing and post-processing the scraped data. For this use case, a simple algorithm (we need only 4 variables that hold previous price, current price, date of today and yesterday's last price) can produce the required values:
+
+-	Date and time of scraping
+-	Last sale’s price
+-	Change between last scraped price and current scraped price expressed as percentage
+-	Change between current scraped price and last yesterday’s last price expressed as percentage
+
+Afterwards, controllers let `output_handler` perform the outputting
+
+*Future considerations*
+
+- new data to calculate -> introduce new data structure/algorithm.
+- new usage of data -> create new interface.
+
+### Output handlers
+
+There is a base class that defines the output() function to implement. Concrete classes are implemented as context manager since usually there are preparation and finalization during I/O. Concrete classes `file_handler` and `stdout_handler` work for file output and console output respectively.
+
+*Future considerations*
+
+- new way to output, for example output to db -> add new output handler and implement db manipulations
+- Growing file size -> The logging module's RotatingFileHandler helps to keep the file at a 
+constant size. 
+
+
