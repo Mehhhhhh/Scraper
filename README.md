@@ -8,20 +8,20 @@ Simple scraper program that scrapes data from https://www.nasdaq.com/market-acti
 |-- setenv  
 |-- README.md  
 |-- controllers  
-|&nbsp;&nbsp;&nbsp;|-- simple_data_source.py  
-|&nbsp;&nbsp;&nbsp;\`-- simple_data_source_test.py  
+|   |-- simple_data_source.py  
+|   \`-- simple_data_source_test.py  
 |-- logging.conf  
 |-- main.py  
 |-- output_handlers  
-|&nbsp;&nbsp;&nbsp;|-- base_handler.py  
-|&nbsp;&nbsp;&nbsp;|-- file_handler.py  
-|&nbsp;&nbsp;&nbsp;|-- output_handler_factory.py  
-|&nbsp;&nbsp;&nbsp;\`-- stdout_handler.py  
+|   |-- base_handler.py  
+|   |-- file_handler.py  
+|   |-- output_handler_factory.py  
+|   \`-- stdout_handler.py  
 |-- requesters  
-|&nbsp;&nbsp;&nbsp;|-- base_requester.py  
-|&nbsp;&nbsp;&nbsp;|-- nasdaq_requester.py  
-|&nbsp;&nbsp;&nbsp;|-- nasdaq_requester_test.py  
-|&nbsp;&nbsp;&nbsp;\`-- requester_factory.py  
+|   |-- base_requester.py  
+|   |-- nasdaq_requester.py  
+|   |-- nasdaq_requester_test.py  
+|   \`-- requester_factory.py  
 \`-- requirements.txt  
 ```
 
@@ -54,9 +54,9 @@ Requester is the layer for getting data from specified resources. There are:
 - `NasdaqRequester` - Concrete class that implements the underlying details;
 > **Implementation for nasdaq webpage**
 >
->The last sale's price is dynamically updated, therefore it's not possible to simply get the static html and fetch the data.
->I have checked the network history from browser and noticed that, calls to this API https://api.nasdaq.com/api/quote/FB/info?assetclass=stocks
->return useful information and we can find last sales price there.
+>The last sale's price is dynamically updated, therefore it's not possible to simply get the static html and fetch the data.  
+>According to the network history from browser, calls to this API https://api.nasdaq.com/api/quote/FB/info?assetclass=stocks
+> actually return useful information and then last sale's price can be found in the response body.
 
 - `RequesterFactory` - Factory to get desired concrete requester class.
 
